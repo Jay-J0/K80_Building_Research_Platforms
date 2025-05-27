@@ -1,35 +1,62 @@
 import pandas as pd
+import glob
 import os
+import re
 
-country = "NL"
-start_year = 2015
-end_year = 2026  # exclusief
+countryCodesEU = [
+    "AT",  # Austria
+    "BE",  # Belgium
+    "BG",  # Bulgaria
+    "HR",  # Croatia
+    "CY",  # Cyprus
+    "CZ",  # Czech Republic
+    "DK",  # Denmark
+    "EE",  # Estonia
+    "FI",  # Finland
+    "FR",  # France
+    "DE",  # Germany
+    "GR",  # Greece
+    "HU",  # Hungary
+    "IE",  # Ireland
+    "IT",  # Italy
+    "LV",  # Latvia
+    "LT",  # Lithuania
+    "LU",  # Luxembourg
+    "MT",  # Malta
+    "NL",  # Netherlands
+    "PL",  # Poland
+    "PT",  # Portugal
+    "RO",  # Romania
+    "SK",  # Slovakia
+    "SI",  # Slovenia
+    "ES",  # Spain
+    "SE"   # Sweden
+]
+
+# Directory where the CSVs are located
+csv_folder = "."
+
+# Pattern to match all NL CSV files
+csv_files = sorted(glob.glob(os.path.join(csv_folder, "NL*.csv")))
 
 all_dfs = []
 
-broken = False
-
-for year in range(start_year, end_year):
-    filename = f"{country}{year}.csv"
-    if os.path.exists(filename):
-        print(f"Laden: {filename}")
-        if start_year == year:
-            df = pd.read_csv(filename, index_col=None, skiprows=0)
-        else:
-            df = pd.read_csv(filename, index_col=None, skiprows=2)
-        df['year'] = year  # optioneel: voeg kolom toe met jaartal
-        all_dfs.append(df)
+for file in csv_files:
+    # Extract year from filename using regex
+    match = re.search(r'NL(\d{4})\.csv', os.path.basename(file))
+    if match:
+        year = int(match.group(1))
     else:
-        print(f"Bestand ontbreekt: {filename}")
-        broken = True
-        break
+        continue  # Skip files that don't match the pattern
 
+    df = pd.read_csv(file)
+    df["Year"] = year  # Add year column
+    all_dfs.append(df)
 
-#niet opslaan als het bestand jaren mist
-if broken == False:
-    # Combineer alles
-    combined_df = pd.concat(all_dfs, ignore_index=True)
+# Combine all into one DataFrame
+combined_df = pd.concat(all_dfs, ignore_index=True)
 
-    # Opslaan
-    combined_df.to_csv(f"{country}_all_years.csv", index=False)
-    print(f"Samengevoegd bestand opgeslagen als: {country}_all_years.csv")
+# Save to a new CSV file
+combined_df.to_csv("NL_combined(2015-2025).csv", index=False)
+
+print(f"Combined {len(csv_files)} files into 'NL_combined.csv' with a Year column.")
