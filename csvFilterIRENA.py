@@ -10,7 +10,7 @@ europeanCountries = [
     'Denmark', 'Estonia', 'Finland', 'France', 'Georgia', 'Germany', 'Greece',
     'Hungary', 'Iceland', 'Ireland', 'Italy', 'Kazakhstan', 'Kosovo', 'Latvia',
     'Liechtenstein', 'Lithuania', 'Luxembourg', 'Malta', 'Moldova', 'Monaco',
-    'Montenegro', 'Netherlands', 'North Macedonia', 'Norway', 'Poland', 'Portugal',
+    'Montenegro', 'Netherlands (Kingdom of the)', 'North Macedonia', 'Norway', 'Poland', 'Portugal',
     'Romania', 'Russia', 'San Marino', 'Serbia', 'Slovakia', 'Slovenia', 'Spain',
     'Sweden', 'Switzerland', 'Türkiye', 'Ukraine', 'United Kingdom', 'Vatican City'
 ]
@@ -19,12 +19,12 @@ euMemberStates = [
     'Austria', 'Belgium', 'Bulgaria', 'Croatia', 'Cyprus', 'Czech Republic',
     'Denmark', 'Estonia', 'Finland', 'France', 'Germany', 'Greece', 'Hungary',
     'Ireland', 'Italy', 'Latvia', 'Lithuania', 'Luxembourg', 'Malta',
-    'Netherlands', 'Poland', 'Portugal', 'Romania', 'Slovakia', 'Slovenia',
+    'Netherlands (Kingdom of the)', 'Poland', 'Portugal', 'Romania', 'Slovakia', 'Slovenia',
     'Spain', 'Sweden'
 ]
 
 
-folder_path = "./IrenaData/"
+folder_path = "./csv/"
 combinedEuroCountries_df = pd.DataFrame()
 combinedEUMemberStates_df = pd.DataFrame()
 for file in os.listdir(folder_path):
