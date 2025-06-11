@@ -82,6 +82,7 @@ end_year = 2026
 output_dir = "EntsoeData"
 os.makedirs(output_dir, exist_ok=True)
 
+skipPauze = False
 for country in countryCodesEU:
     country_folder_name = country_names[country]
     country_dir = os.path.join(output_dir, country_folder_name)
@@ -92,12 +93,12 @@ for country in countryCodesEU:
         if not os.path.exists(filename):
             client = EntsoePandasClient(api_key=api_key)
             start = pd.Timestamp(f'{year}0101', tz='Europe/Brussels')
-            end = pd.Timestamp(f'{year}1231', tz='Europe/Brussels')
+            end = pd.Timestamp(f'{year+1}0101', tz='Europe/Brussels')
 
             try:
                 print(f"Opvragen: {country} - {year}")
                 pd_dataframe = client.query_generation(country, start=start, end=end, psr_type=None)
-                pd_dataframe.to_csv(filename, index=False)
+                pd_dataframe.to_csv(filename, index=True)
                 print(f"Opgeslagen als: {filename}")
                 time.sleep(10)
 
