@@ -30,6 +30,8 @@ def process_country(folder_path, output_file):
         first_row = preview.iloc[0]
         second_row = preview.iloc[1]
 
+    
+
         # Check if second row has any non-numeric values → likely a second header
         has_second_header = any(pd.to_numeric(second_row, errors='coerce').isna())
 
@@ -41,6 +43,7 @@ def process_country(folder_path, output_file):
 
 
         filename = os.path.basename(file_path)
+        cc = filename[0:2]
 
         # Extract year from filename (e.g., 'NL2015.csv')
         try:
@@ -48,31 +51,16 @@ def process_country(folder_path, output_file):
         except ValueError:
             print(f"Skipping {file_path}: couldn't extract year.")
             continue
+        
 
-        # Create timestamp column assuming 15-minute intervals starting Jan 1
-        try:
-            cc = filename[0:2]
-
-            l = len(df)
-
-            if 35040-100 <= l <= 35040+100:
-                frequency = "15min"
-            elif 17520-50 <= l <= 17520+50:
-                frequency = "30min"
-            elif 8760-25 <= l <= 8760+25:
-                frequency = "1h"
-            else:
-                frequency = "1h"
-                print(f"frequency klopt niet, {l} datapunten per jaar")
+        df.columns.values[0] = "timestamp"
+        df["timestamp"] = pd.to_datetime(df["timestamp"]).apply(
+            lambda x: pd.to_datetime(x).tz_localize(None) if pd.to_datetime(x).tzinfo else pd.to_datetime(x)
+        )
 
 
-            print(f"frequency: {frequency}")
-            start_time = pd.Timestamp(f"{year}-01-01 00:00")
-            df['timestamp'] = pd.date_range(start=start_time, periods=len(df), freq=frequency)
-            df.to_csv(str(os.path.join(folder_path, cc)) + "kaas.csv")
-        except Exception as e:
-            print(f"Failed to generate timestamps for {file_path}: {e}")
-            continue
+
+        #df.to_csv(os.path.join(folder_path, cc+ "debug" + output_file), index=False)
 
         # Extract month from timestamp
         df['month'] = df['timestamp'].dt.month
@@ -97,6 +85,7 @@ def process_country(folder_path, output_file):
                     
                 else:
                     #print(f"now in year {year} month {df['month']}")
+                    
                     if cc not in countries_with_one_dinges:
                         countries_with_one_dinges.append(cc)
                     temp_df = pd.DataFrame({
@@ -110,7 +99,8 @@ def process_country(folder_path, output_file):
                 #if 'electricity production MW' in grouped.columns:
                 #    grouped['electricity production MW'] = grouped['electricity production MW'].astype(str) + ' MW'
                 #grouped['electricity consumption MW'] = grouped['electricity consumption MW'].astype(str) + ' MW'
-                
+                # Convert numeric month to full month name
+                grouped['month'] = grouped['month'].apply(lambda x: pd.to_datetime(f'{year}-{x:02d}-01').strftime('%B'))
                 
                 all_data.append(grouped)
                 
@@ -122,14 +112,13 @@ def process_country(folder_path, output_file):
 
     if not all_data:
         print("No valid data found to combine.")
-        exit()
+        return
 
     # Combine all grouped data
     final_df = pd.concat(all_data, ignore_index=True)
     #final_df = final_df.groupby(['year', 'month', 'energy source'], as_index=False).sum()
 
-    # Convert numeric month to full month name
-    final_df['month'] = final_df['month'].apply(lambda x: pd.to_datetime(f'2023-{x:02d}-01').strftime('%B'))
+    
 
     # Optional: Sort by year and calendar month order
     month_order = ['January', 'February', 'March', 'April', 'May', 'June',
