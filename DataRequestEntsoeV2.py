@@ -9,7 +9,7 @@ import os
 import time
 from entsoe import EntsoePandasClient
 
-api_key = 'eb7ce115-9f12-468e-a744-930a6a104c79'
+api_key = 'xxx'
 
 url = "https://web-api.tp.entsoe.eu/api"
 
